@@ -222,7 +222,23 @@ public class Contacts.ContactSheet : Grid {
           add_row_with_label (TypeSet.phone.format_type (phone), phone.value);
         }
 #else
-        add_row_with_label (TypeSet.phone.format_type (phone), phone.value);
+        // Show a call button when we have a hanlder for it
+        Button call_button = null;
+        Button sms_button = null;
+        if (AppInfo.get_all_for_type ("x-scheme-handler/tel").length () > 0) {
+          call_button = create_button ("call-start-symbolic");
+          call_button.clicked.connect (() => {
+            Utils.start_call (phone.value);
+          });
+        }
+        if (AppInfo.get_all_for_type ("x-scheme-handler/sms").length () > 0) {
+          sms_button = create_button ("mail-unread-symbolic");
+          sms_button.clicked.connect (() => {
+            Utils.send_sms (phone.value);
+          });
+        }
+
+        add_row_with_label (TypeSet.phone.format_type (phone), phone.value, call_button, sms_button);
 #endif
       }
     }
