@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using Gtk;
+using Gee;
+using Hdy;
 using Folks;
 
 public class Contacts.App : Gtk.Application {
@@ -30,7 +33,8 @@ public class Contacts.App : Gtk.Application {
     { "about",            show_about          },
     { "change-book",      change_address_book },
     { "online-accounts",  online_accounts     },
-    { "new-contact",      new_contact         },
+    { "new-contact",      on_new_contact      },
+    { "new-contact-data", on_new_contact,  "a(ss)" },
     { "show-contact",     on_show_contact, "s"}
   };
 
@@ -293,8 +297,66 @@ public class Contacts.App : Gtk.Application {
     setup_window.show ();
   }
 
-  public void new_contact () {
-    this.window.new_contact ();
+  private void on_new_contact (SimpleAction action, Variant? param) {
+    HashTable<string, Value?> details = null;
+    if (param != null)
+      details = array_to_details (param);
+
+    if (window == null)
+      create_window ();
+
+     window.present ();
+     window.new_contact (details);
+  }
+
+  private void add_field_details<T> (HashTable<string, Value?> details, string key, string value) {
+    var val = details.get(key);
+    Set<T> current = (val != null) ? (Set<T>) details.get(key): null;
+
+    if (current == null) {
+      current = new HashSet<T> ();
+      details.set (key, current);
+    }
+    // WORKAROUND: This is a workaround for https://gitlab.gnome.org/GNOME/vala/issues/871
+    var obj = Object.new (typeof (T),
+                          "t-type", typeof(string),
+                          "t-dup-func", string.dup,
+                          "t-destroy-func", free,
+                          "value", value);
+    current.add (obj);
+  }
+
+  /* This converts a array of (key, value) to HashTable details expected by folks */
+  /* Todo: implement all property, currently only a couple of properties can be set via dbus */
+  private HashTable<string, Value?> array_to_details (Variant param) {
+    var details = new HashTable<string, Value?> (str_hash, str_equal);
+    foreach (Variant item in param) {
+      string? key = item.get_child_value(0) as string;
+      string? value = item.get_child_value(1) as string;
+      if (key == null || value == null)
+        continue;
+
+      switch (key) {
+        case "alias":
+        case "full-name":
+        case "nickname":
+          details.set (key, value);
+          break;
+        case "email-addresses":
+          add_field_details<EmailFieldDetails> (details, key, value);
+          break;
+        case "notes":
+          add_field_details<NoteFieldDetails> (details, key, value);
+          break;
+        case "phone-numbers":
+          add_field_details<PhoneFieldDetails> (details, key, value);
+          break;
+        default:
+          warning ("Not implemented or unknown property '%s'", key);
+          break;
+      }
+    }
+    return details;
   }
 
   private void on_show_contact(SimpleAction action, Variant? param) {

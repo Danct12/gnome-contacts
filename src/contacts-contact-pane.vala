@@ -203,8 +203,7 @@ public class Contacts.ContactPane : Gtk.ScrolledWindow {
     start_editing ();
   }
 
-  public void new_contact () {
-    var details = new HashTable<string, Value?> (str_hash, str_equal);
+  public void new_contact (HashTable<string, Value?> details) {
     string[] writeable_properties;
     // TODO: make sure we have a primary_store
     if (this.store.aggregator.primary_store != null) {

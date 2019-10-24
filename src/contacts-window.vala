@@ -374,21 +374,6 @@ public class Contacts.Window : Hdy.ApplicationWindow {
   }
 
   [GtkCallback]
-  public void new_contact () {
-    if (this.state == UiState.UPDATING || this.state == UiState.CREATING)
-      return;
-
-    this.list_pane.select_contact (null);
-
-    this.state = UiState.CREATING;
-
-    this.right_header.title = _("New Contact");
-
-    this.contact_pane.new_contact ();
-    show_contact_pane ();
-  }
-
-  [GtkCallback]
   private void on_cancel_visible () {
     update_header ();
   }
@@ -410,6 +395,21 @@ public class Contacts.Window : Hdy.ApplicationWindow {
         this.content_box.folded &&
         !this.cancel_button.visible &&
         this.header.visible_child == this.right_header;
+  }
+
+  public void new_contact (HashTable<string, Value?>? details = null) {
+    if (this.state == UiState.UPDATING || this.state == UiState.CREATING)
+      return;
+
+    this.list_pane.select_contact (null);
+
+    this.state = UiState.CREATING;
+
+    this.right_header.title = _("New Contact");
+
+    this.contact_pane.new_contact (
+      (details != null) ? details: new HashTable<string, Value?> (str_hash, str_equal));
+    show_contact_pane ();
   }
 
   private void show_list_pane () {

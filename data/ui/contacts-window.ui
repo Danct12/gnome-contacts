@@ -169,7 +169,7 @@
                     <property name="halign">center</property>
                     <property name="valign">center</property>
                     <property name="tooltip_text" translatable="yes">Create new contact</property>
-                    <signal name="clicked" handler="new_contact" object="ContactsWindow" after="no" swapped="no"/>
+                    <property name="action-name">app.new-contact</property>
                     <child internal-child="accessible">
                       <object class="AtkObject" id="add_button_atkobject">
                         <property name="AtkObject::accessible-name" translatable="yes">Add contact</property>
