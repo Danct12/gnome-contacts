@@ -214,7 +214,7 @@ public class Contacts.ContactSheet : Grid {
         if (this.store.caller_account != null) {
           var call_button = create_button ("call-start-symbolic");
           call_button.clicked.connect (() => {
-            Utils.start_call (phone.value, this.store.caller_account);
+            Utils.start_call (phone.get_normalised (), this.store.caller_account);
           });
 
           add_row_with_label (TypeSet.phone.format_type (phone), phone.value, call_button);
@@ -228,13 +228,13 @@ public class Contacts.ContactSheet : Grid {
         if (AppInfo.get_all_for_type ("x-scheme-handler/tel").length () > 0) {
           call_button = create_button ("call-start-symbolic");
           call_button.clicked.connect (() => {
-            Utils.start_call (phone.value);
+            Utils.start_call (phone.get_normalised ());
           });
         }
         if (AppInfo.get_all_for_type ("x-scheme-handler/sms").length () > 0) {
           sms_button = create_button ("mail-unread-symbolic");
           sms_button.clicked.connect (() => {
-            Utils.send_sms (phone.value);
+            Utils.send_sms (phone.get_normalised ());
           });
         }
 
