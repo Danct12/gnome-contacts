@@ -245,11 +245,11 @@ public class Contacts.ContactSheet : Grid {
   }
 
   private void add_im_addresses (Persona persona) {
-#if HAVE_TELEPATHY
     var im_details = persona as ImDetails;
     if (im_details != null) {
       foreach (var protocol in im_details.im_addresses.get_keys ()) {
         foreach (var id in im_details.im_addresses[protocol]) {
+#if HAVE_TELEPATHY
           if (persona is Tpf.Persona) {
             var button = create_button ("user-available-symbolic");
             button.clicked.connect (() => {
@@ -264,10 +264,12 @@ public class Contacts.ContactSheet : Grid {
             });
             add_row_with_label (ImService.get_display_name (protocol), id.value, button);
           }
+#else
+          add_row_with_label (ImService.get_display_name (protocol), id.value);
+#endif
         }
       }
     }
-#endif
   }
 
   private void add_urls (Persona persona) {
