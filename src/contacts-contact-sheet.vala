@@ -232,7 +232,7 @@ public class Contacts.ContactSheet : Grid {
           });
         }
         if (AppInfo.get_all_for_type ("x-scheme-handler/sms").length () > 0) {
-          sms_button = create_button ("mail-unread-symbolic");
+          sms_button = create_button ("user-available-symbolic");
           sms_button.clicked.connect (() => {
             Utils.send_sms (phone.get_normalised ());
           });
